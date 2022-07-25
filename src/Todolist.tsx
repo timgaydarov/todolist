@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 type PropsType = {
   title: string
   tasks: Array<TaskType>
+  removeTask: (tasksId: number) => void
 }
 
 type TaskType = {
@@ -12,6 +13,19 @@ type TaskType = {
 }
 
 export function Todolist(props: PropsType) {
+  const tasksFilter = (filterValue: string) => {
+    setFilter(filterValue)
+  }
+
+  const [filter, setFilter] = useState('All')
+
+  let colander = props.tasks
+  if (filter === 'Active') {
+    colander = props.tasks.filter(el => el.isDone)
+  }
+  if (filter === 'Completed') {
+    colander = props.tasks.filter(el => !el.isDone)
+  }
   return (
     <div>
       <h3>{props.title}</h3>
@@ -20,14 +34,21 @@ export function Todolist(props: PropsType) {
         <button>+</button>
       </div>
       <ul>
-        <li><input type="checkbox" checked={props.tasks[0].isDone}/> <span>{props.tasks[0].title}</span></li>
-        <li><input type="checkbox" checked={props.tasks[1].isDone}/> <span>{props.tasks[1].title}</span></li>
-        <li><input type="checkbox" checked={props.tasks[2].isDone}/> <span>{props.tasks[2].title}</span></li>
+        {colander.map((el, key) => {
+          return (
+            <li key={el.id}>
+              <button
+                onClick={() => props.removeTask(el.id)}>Х
+              </button>
+              <input type="checkbox" defaultChecked={el.isDone}/> <span>{el.title}</span>
+            </li>
+          )
+        })}
       </ul>
       <div>
-        <button>All</button>
-        <button>Active</button>
-        <button>Completed</button>
+        <button onClick={() => tasksFilter('All')}>All</button>
+        <button onClick={() => tasksFilter('Active')}>Active</button>
+        <button onClick={() => tasksFilter('Completed')}>Completed</button>
       </div>
     </div>
   );
